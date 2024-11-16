@@ -1,0 +1,40 @@
+.signup-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.signup-container input,
+.signup-container select {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.signup-container button {
+    padding: 10px 20px;
+    background-color: #728c5a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.signup-container button:hover {
+    background-color: #102f15;
+}
+
+.app-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3rem;
+    color: #102f15;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px #eaf181;
+}
