@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import LogoutButton from "../Login/Logout.jsx";
 import { url } from '../../constants.js';
 import { Link } from 'react-router-dom';
+import MentorScheduleInput from './MentorScheduleinput.jsx';
 import axios from 'axios';
 import './Doubt.css';
+import MentorNavbar from './MentorNavbar.jsx';
 
 const MentorDoubt = () => {
     const accessToken = localStorage.getItem("accessToken")
@@ -63,40 +65,80 @@ const MentorDoubt = () => {
         }
     };
 
+    const handleRemoveResponse = async (id) => {
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+        setDoubts((prevDoubts) =>
+            prevDoubts.map((doubt) =>
+                doubt.doubt_id === id
+                    ? { ...doubt, status: "open", response: "" }
+                    : doubt
+            )
+        );
+        try {
+            await axios.post(`${url}/users/mentor/deleteresponse`,
+                {
+                    cookies: {
+                        accessToken: accessToken,
+                        refreshToken: refreshToken
+                    },
+                    doubt_id: id
+                })
+
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
     return (
-        <div className="mentor-doubt-container">
-            {!login && <Link to="/login" className="login-link">Login</Link>}
-            {login && <LogoutButton />}
-            <h2>Mentor Dashboard</h2>
-            <div className="mentor-doubts-list">
-                {doubts.map((doubt, id) => (
-                    <div key={id} className="mentor-doubt-item">
-                        <h3>{doubt.title}</h3>
-                        <p>{doubt.description}</p>
-                        <p>Status: {doubt.status}</p>
-                        <p>Response: {doubt.response || "No response yet"}</p>
-                        {doubt.status === "open" && (
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const response = e.target.response.value;
-                                    handleAddResponse(doubt.doubt_id, response);
-                                    e.target.reset();
-                                }}
-                            >
-                                <input
-                                    type="text"
-                                    name="response"
-                                    placeholder="Add your response"
-                                    required
-                                />
-                                <button type="submit">Submit</button>
-                            </form>
-                        )}
-                    </div>
-                ))}
+        <>
+            <h1>Mentor Dashboard</h1>
+            <MentorNavbar />
+            <div className="mentor-doubt-container">
+                {!login && <Link to="/login" className="login-link">Login</Link>}
+                {login && <LogoutButton />}
+                {login && <MentorScheduleInput />}
+                <div className="mentor-doubts-list">
+                    {doubts.map((doubt, id) => (
+                        <div key={id} className="mentor-doubt-item">
+                            <h3>{doubt.title}</h3>
+                            <p>{doubt.description}</p>
+                            <p>Status: {doubt.status}</p>
+                            <p>Response: {doubt.response || "No response yet"}</p>
+                            {doubt.status === "open" && (
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const response = e.target.response.value;
+                                        handleAddResponse(doubt.doubt_id, response);
+                                        e.target.reset();
+                                    }}
+                                >
+                                    <input
+                                        type="text"
+                                        name="response"
+                                        placeholder="Add your response"
+                                        required
+                                    />
+                                    <button type="submit">Submit</button>
+                                </form>
+                            )}
+                            {doubt.status === "resolved" && (
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        handleRemoveResponse(doubt.doubt_id);
+                                        e.target.reset();
+                                    }}
+                                >
+                                    <button type="submit">Delete response</button>
+                                </form>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

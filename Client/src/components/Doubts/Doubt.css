@@ -100,3 +100,99 @@
     background-color: #eaf181;
     transform: scale(0.98);
 }
+
+.mentor-schedule-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mentor-schedule-container h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.mentor-schedule-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.mentor-schedule-container input[type="datetime-local"] {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.mentor-schedule-container input[type="datetime-local"]:focus {
+    border-color: #007bff;
+}
+
+.mentor-schedule-container button {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.mentor-schedule-container button:hover {
+    background-color: #218838;
+}
+
+.mentor-schedule-container p {
+    text-align: center;
+    font-size: 1rem;
+    color: #d9534f;
+    margin-top: 10px;
+}
+
+.schedules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.schedule-item {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-item h3 {
+    margin: 0 0 10px 0;
+}
+
+.schedule-item p {
+    margin: 5px 0;
+}
+
+.schedule-item button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.schedule-item button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.login-link {
+    text-decoration: none;
+    font-size: 18px;
+    margin: 20px 0px;
+}

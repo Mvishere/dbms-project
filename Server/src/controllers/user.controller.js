@@ -154,23 +154,97 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 })
 
 const studentDoubts = asyncHandler(async (req, res, next) => {
-    const doubts = await db.query("select title, description, status, response_text response from doubts left join doubt_responses on doubts.doubt_id = doubt_responses.doubt_id where user_id=$1", [req.user.user_id]);
+    if (req.user.role !== "student") {
+        return res.status(401).json("Unauthorized access")
+    }
+    const doubts = await db.query("select doubts.doubt_id, title, description, status, response_text response from doubts left join doubt_responses on doubts.doubt_id = doubt_responses.doubt_id where user_id=$1", [req.user.user_id]);
     res.json(doubts.rows)
 })
 
 const postStudentDoubts = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "student") {
+        return res.status(401).json("Unauthorized access")
+    }
     await db.query("insert into doubts (user_id, title, description) values ($1, $2, $3)", [req.user.user_id, req.body.title, req.body.description])
     res.status(200).json("doubt posted successfully")
 })
 
 const mentorDoubts = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "mentor") {
+        return res.status(401).json("Unauthorized access")
+    }
     const doubts = await db.query("select doubts.doubt_id, title, description, status, response_text response from doubts left join doubt_responses on doubts.doubt_id = doubt_responses.doubt_id");
     res.status(200).json(doubts.rows)
 })
 
 const respondDoubt = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "mentor") {
+        return res.status(401).json("Unauthorized access")
+    }
     await db.query("insert into doubt_responses (doubt_id, mentor_id, response_text) values ($1, $2, $3)", [req.body.doubt_id, req.user.user_id, req.body.response_text])
     res.status(200).json("doubt responded successfully")
 })
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, studentDoubts, postStudentDoubts, mentorDoubts, respondDoubt }
+const deleteDoubt = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "student") {
+        return res.status(401).json("Unauthorized access")
+    }
+    const { id } = req.body;
+    try {
+        const result = await db.query("delete from doubts where doubt_id=$1", [id])
+
+        return res.status(200).json({ message: "Doubt deleted successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
+})
+
+const deleteResponse = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "mentor") {
+        return res.status(401).json("Unauthorized access")
+    }
+    const { doubt_id } = req.body;
+    try {
+        await db.query("delete from doubt_responses where doubt_id=$1", [doubt_id]);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" })
+    }
+})
+
+const mentorSchedule = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "mentor") {
+        return res.status(401).json("Unauthorized access")
+    }
+    const time_stamp = req.body.time_slot
+    await db.query("insert into schedules (mentor_id, time_slot) values ($1, $2);", [req.user.user_id, time_stamp])
+    return res.status(200).json({ message: "Schedule created" })
+})
+
+const getSchedule = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "mentor") {
+        return res.status(401).json("Unauthorized access")
+    }
+    const result = await db.query("select time_slot, is_booked status from schedules where mentor_id=$1", [req.user.user_id])
+    return res.status(200).json(result.rows);
+})
+
+const getScheduleStudent = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "student") {
+        return res.status(401).json("Unauthorized access")
+    }
+
+    const schedules = await db.query("select schedule_id, mentor_id, name, email, time_slot from users inner join schedules on users.user_id = schedules.mentor_id");
+    return res.status(200).json(schedules.rows);
+})
+
+const bookSchedule = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== "student") {
+        return res.status(401).json("Unauthorized access")
+    }
+
+    await db.query("insert into booked (mentor_id,  student_id, schedule_id, booking_time) values ($1, $2, $3, $4)", [req.body.mentor_id, req.user.user_id, req.body.schedule_id, req.body.time_slot])
+    return res.status(200).json("session booked");
+})
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, studentDoubts, postStudentDoubts, mentorDoubts, respondDoubt, deleteDoubt, deleteResponse, mentorSchedule, getSchedule, getScheduleStudent, bookSchedule }
