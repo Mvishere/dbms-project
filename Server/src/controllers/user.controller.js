@@ -234,7 +234,7 @@ const getScheduleStudent = asyncHandler(async (req, res, next) => {
         return res.status(401).json("Unauthorized access")
     }
 
-    const schedules = await db.query("select schedule_id, mentor_id, name, email, time_slot from users inner join schedules on users.user_id = schedules.mentor_id");
+    const schedules = await db.query("select schedule_id, mentor_id, name, email, time_slot, is_booked from users inner join schedules on users.user_id = schedules.mentor_id");
     return res.status(200).json(schedules.rows);
 })
 
